@@ -1,0 +1,19 @@
+Portfolio Advisory Principles
+
+Investment recommendations should be based on the investor's stated goals,
+risk profile, investment horizon, and current portfolio characteristics.
+
+The advisory process should identify material portfolio risks before
+suggesting changes.
+
+Recommendations should explain the reasoning behind proposed investment or
+rebalancing actions.
+
+When available information is insufficient to support a recommendation, the
+agent should communicate the limitation rather than invent missing
+information.
+
+Recommendations should communicate relevant risks and trade-offs.
+
+The advisory output is intended as decision support and should include an
+appropriate suitability disclaimer.

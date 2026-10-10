@@ -1,0 +1,16 @@
+
+Portfolio Rebalancing
+
+Rebalancing is the process of adjusting portfolio holdings when the portfolio
+has moved away from its intended allocation.
+
+An advisory recommendation to rebalance should consider the investor's risk
+profile, investment objectives, investment horizon, current portfolio
+allocation, and the reason for the deviation.
+
+Rebalancing recommendations should explain which portfolio characteristics
+are driving the recommendation and should communicate relevant risks and
+trade-offs.
+
+Short-term market movements alone should not automatically be treated as
+sufficient justification for a portfolio change.

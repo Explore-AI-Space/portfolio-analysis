@@ -1,0 +1,17 @@
+Investor Risk Profiles
+
+Conservative investors generally have a lower tolerance for investment losses
+and portfolio volatility. Advisory recommendations should place greater
+emphasis on capital preservation, liquidity, and controlling portfolio risk.
+
+Moderate investors generally seek a balance between long-term growth and
+risk management. Recommendations should consider diversification, controlled
+equity exposure, and the investor's investment horizon.
+
+Aggressive investors generally have a higher tolerance for market volatility
+and investment losses and may accept greater portfolio risk in pursuit of
+long-term growth.
+
+Risk tolerance should not be considered in isolation. Portfolio
+recommendations should also consider the investor's financial goals,
+investment horizon, liquidity requirements, and current holdings.
