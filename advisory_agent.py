@@ -1,20 +1,50 @@
 
 from pathlib import Path
-from typing import Any
+from typing import TypedDict, Any
+from langgraph.graph import StateGraph, START, END
 
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
+from pydantic import BaseModel, Field
 
 FAISS_DIR = Path("faiss_index")
+
+
+class AdvisoryOutput(BaseModel):
+    recommendation: str = Field(
+        description="Personalized portfolio advisory recommendation"
+    )
+
+    rationale: list[str] = Field(
+        description="Reasons supporting the recommendation"
+    )
+
+    key_risks: list[str] = Field(
+        description="Important risks and trade-offs"
+    )
+
+    rebalancing_actions: list[str] = Field(
+        description="Potential rebalancing actions, if justified by the available data"
+    )
+
+    disclaimer: str = Field(
+        description="Investment advice disclaimer"
+    )
+
+class AdvisoryState(TypedDict, total=False):
+    investor_profile: dict[str, Any]
+    portfolio_analysis: dict[str, Any]
+    risk_assessment: dict[str, Any]
+    question: str
+    advisory: dict[str, Any]
 
 
 def build_advisory_chain():
     # 1. Load the embedding model
     embeddings = OpenAIEmbeddings(
-        model="text-embedding-3-small"
+        model="text-embedding-3-small",
     )
 
     # 2. Load the existing FAISS index
@@ -69,19 +99,23 @@ def build_advisory_chain():
         model="gpt-4o-mini",
         temperature=0,
     )
+    structured_llm = llm.with_structured_output(AdvisoryOutput)
 
     # 6. Connect retrieval, prompt, LLM, and output parser
     chain = (
         {
-            "context": retriever | format_documents,
+            "context": (
+                (lambda x: x["question"])
+                | retriever
+                | format_documents
+            ),
             "investor_profile": lambda x: x["investor_profile"],
             "portfolio_analysis": lambda x: x["portfolio_analysis"],
             "risk_assessment": lambda x: x["risk_assessment"],
             "question": lambda x: x["question"],
         }
         | prompt
-        | llm
-        | StrOutputParser()
+        | structured_llm
     )
 
     return chain
