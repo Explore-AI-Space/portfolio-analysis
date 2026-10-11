@@ -148,20 +148,56 @@ def run_advisory(
         }
     )
 
+def advisory_node(state: AdvisoryState) -> dict:
+    result = run_advisory(
+        investor_profile=state["investor_profile"],
+        portfolio_analysis=state["portfolio_analysis"],
+        risk_assessment=state["risk_assessment"],
+        question=state["question"],
+    )
+
+    return {
+        "advisory": result.model_dump()
+    }
+
+
 
 if __name__ == "__main__":
     # Illustrative test data, not a real investor assessment.
-    result = run_advisory(
-        investor_profile={
+    ### result = run_advisory(
+    #     investor_profile={
+    #         "risk_tolerance": "moderate",
+    #         "investment_horizon": "5 years",
+    #         "investment_goal": "wealth creation",
+    #     },
+    #     portfolio_analysis={
+    #         "concentration_risk": "high",
+    #         "holdings": "Not provided in this test",
+    #     },
+    #     risk_assessment={
+    #         "investor_risk_profile": "moderate",
+    #         "portfolio_risk_profile": "high",
+    #         "suitability": "mismatch",
+    #         "key_risk_factors": ["High concentration risk"],
+    #         "explanation": "Illustrative test assessment",
+    #         "confidence": 0.91,
+    #     },
+    #     question=(
+    #         "Explain what factors should be considered when "
+    #         "evaluating rebalancing options for this investor."
+    #     ),
+    # # )
+    state = {
+        "investor_profile": {
             "risk_tolerance": "moderate",
             "investment_horizon": "5 years",
             "investment_goal": "wealth creation",
         },
-        portfolio_analysis={
+        "portfolio_analysis": {
             "concentration_risk": "high",
             "holdings": "Not provided in this test",
         },
-        risk_assessment={
+        "risk_assessment": {
             "investor_risk_profile": "moderate",
             "portfolio_risk_profile": "high",
             "suitability": "mismatch",
@@ -169,11 +205,16 @@ if __name__ == "__main__":
             "explanation": "Illustrative test assessment",
             "confidence": 0.91,
         },
-        question=(
-            "Explain what factors should be considered when "
-            "evaluating rebalancing options for this investor."
+        "question": (
+            "What factors should be considered when evaluating "
+            "rebalancing options for this investor?"
         ),
-    )
+    }
 
-    print("\nADVISORY RESPONSE:\n")
-    print(result)
+    node_result = advisory_node(state)
+
+    print("\nADVISORY NODE OUTPUT:\n")
+    print(node_result)
+
+    # print("\nADVISORY RESPONSE:\n")
+    # print(result)
