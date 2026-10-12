@@ -17,15 +17,15 @@ class QAResult(BaseModel):
 
     risk_consistency: bool = Field(
         description=(
-            "Whether the advisory is consistent with the supplied "
-            "risk assessment."
+            "Whether the advisory acknowledges and does not "
+            "contradict the supplied risk assessment."
         )
     )
 
     suitability_check: bool = Field(
         description=(
-            "Whether the advisory considers the investor's risk "
-            "profile and available financial goals."
+            "Whether the advisory appropriately considers the "
+            "investor profile without unsupported suitability claims."
         )
     )
 
@@ -86,6 +86,16 @@ def qa_node(state: QAState) -> dict:
         raise ValueError(
             f"QA Agent is missing required inputs: {missing}"
         )
+    
+    # Deterministic disclaimer-presence check
+    advisory = state["advisory"]
+    disclaimer = advisory.get("disclaimer", "")
+    
+    disclaimer_present = (
+        isinstance(disclaimer, str)
+        and bool(disclaimer.strip())
+    )
+
 
     prompt = f"""
     You are the QA Agent for a portfolio advisory application.
@@ -107,24 +117,66 @@ def qa_node(state: QAState) -> dict:
     {state['advisory']}
 
     Review instructions:
-    1. Check whether the advisory contradicts the risk assessment.
-    2. Check whether suitability considers the investor profile.
-    3. Identify material financial claims unsupported by the inputs.
-    4. Flag invented portfolio values, unjustified allocations,
-       and guaranteed-return claims.
-    5. Check whether an appropriate disclaimer is present.
-    6. Do not assume a claim is correct merely because the advisory
-       or risk assessment states it.
-    7. Do not claim regulatory compliance has been established.
-    8. If information is insufficient to verify a material claim,
-       flag it for review rather than assuming it is true.
-    9. Set status to:
-       - pass: no material issues identified;
-       - needs_review: uncertainty or correctable issues remain;
-       - fail: material problems make the advisory unsuitable
-         for release.
-    10. Explain specific issues and required corrections.
-        Do not rewrite the advisory yourself.
+    1. RISK CONSISTENCY
+
+    Return True if the advisory acknowledges and does not contradict
+    the supplied risk assessment.
+
+    A recommendation to review concentration or diversification is
+    consistent with a high portfolio risk assessment.
+
+    Return False if the advisory contradicts or materially ignores
+    a risk in a way that could make the advice misleading.
+
+    2. SUITABILITY CHECK
+
+    Return True if the advisory appropriately considers the supplied
+    investor profile and avoids unsupported suitability claims.
+
+    An exact allocation is not required to pass this check.
+
+    Return False if the advisory recommends an approach that
+    conflicts with the investor profile or makes unsupported
+    personalized suitability claims.
+
+    If the information is insufficient to assess suitability,
+    mention the limitation in issues. Use needs_review as the
+    overall status when appropriate.
+
+    3. FACTUAL GROUNDING
+
+    Check whether material financial claims are supported by the
+    supplied inputs.
+
+    Flag invented portfolio values, unsupported financial claims,
+    and guaranteed-return claims.
+
+    Do not assume a claim is correct merely because another agent
+    states it.
+
+    4. DISCLAIMER
+
+    The deterministic disclaimer-presence check returned:
+    {disclaimer_present}
+
+    Set disclaimer_present to this exact Boolean value.
+
+    A non-empty disclaimer is not necessarily an adequate disclaimer.
+    If the wording is inadequate, explain the limitation in issues
+    and choose the overall status accordingly.
+
+    5. OVERALL STATUS
+
+    - pass: no material issues identified.
+    - needs_review: uncertainty or correctable issues remain.
+    - fail: material problems make the advisory unsuitable for release.
+
+    Do not claim that regulatory compliance has been established.
+    Do not invent missing information.
+    Explain the reasons for any failed checks.
+    Provide specific required corrections when necessary.
+
+    Return the result using the required QAResult schema.
     """
 
     result = structured_llm.invoke(prompt)
