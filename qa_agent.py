@@ -90,7 +90,7 @@ def qa_node(state: QAState) -> dict:
     # Deterministic disclaimer-presence check
     advisory = state["advisory"]
     disclaimer = advisory.get("disclaimer", "")
-    
+
     disclaimer_present = (
         isinstance(disclaimer, str)
         and bool(disclaimer.strip())
@@ -130,18 +130,25 @@ def qa_node(state: QAState) -> dict:
 
     2. SUITABILITY CHECK
 
-    Return True if the advisory appropriately considers the supplied
-    investor profile and avoids unsupported suitability claims.
+    Evaluate whether the advisory appropriately addresses the
+investor profile and identified portfolio risks.
 
-    An exact allocation is not required to pass this check.
+Return True if the advisory acknowledges relevant risks and
+suggests reasonable evaluation or review steps without making
+unsupported recommendations.
 
-    Return False if the advisory recommends an approach that
-    conflicts with the investor profile or makes unsupported
-    personalized suitability claims.
+A recommendation to evaluate concentration and diversification
+can pass when high concentration risk is identified.
 
-    If the information is insufficient to assess suitability,
-    mention the limitation in issues. Use needs_review as the
-    overall status when appropriate.
+Do not return False solely because the advisory does not
+explicitly repeat the investor's risk profile.
+
+Return False if the advisory ignores material suitability
+concerns, contradicts the investor profile, or recommends
+unsupported actions.
+
+If a material gap remains, describe it in issues and use
+needs_review when appropriate.
 
     3. FACTUAL GROUNDING
 
